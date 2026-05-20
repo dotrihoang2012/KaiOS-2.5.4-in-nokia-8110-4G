@@ -103,8 +103,9 @@ python edl.py w boot boot.img --loader=8110.mbn
 ```
 
 **Step 3 — Reboot**
-
-Unplug and reboot the device manually.
+```bash
+python edl.py reset
+```
 
 ---
 
