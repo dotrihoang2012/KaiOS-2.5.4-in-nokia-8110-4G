@@ -1,0 +1,32 @@
+##!/system/bin/sh
+function startjrdqxdmservice(){
+  LNU_tmp=$(getprop persist.sys.kaiosqxdm.path)
+  if [ ! "$LNU_tmp" == "" ] ; then
+    echo '$LNU_tmp = '"$LNU_tmp"
+      if [ "$(getprop persist.sys.kaiosdiagcfg.enable)" == "1" ] ; then
+        /system/bin/diag_mdlog -f /storage/sdcard/diag.cfg -o "$LNU_tmp"
+      else
+        /system/bin/diag_mdlog -f /vendor/jrddiag.cfg -o "$LNU_tmp"
+      fi
+  fi
+}
+
+function startjrdqxdmservice2(){
+  LNU_tmp=$(getprop persist.sys.kaiosqxdm.path)
+  LNU_props=$(getprop persist.sys.autolog.props)
+  if [ ! "$LNU_tmp" == "" ] ; then
+    /system/bin/diag_mdlog -f /vendor/jrddiag.cfg -o "$LNU_tmp" -s "$LNU_props" -n 2
+  fi
+}
+
+function jrdqxdmservice(){
+  chmod -R 777 /storage/emulated/kaioslog
+  if [ "$(getprop persist.sys.kaiosqxdm.enable)" == "1" ] ; then
+    if [ "$(getprop persist.sys.autolog.enable)" == "1" ] ; then
+      startjrdqxdmservice2
+    else
+      startjrdqxdmservice
+    fi
+  fi
+}
+jrdqxdmservice

@@ -1,0 +1,48 @@
+##!/system/bin/sh
+function startjrdinitlogcat(){
+  LNU_tmp1=$(getprop persist.sys.initkeys.enable)
+  if [ "$LNU_tmp1" == "logcatinput" ] ; then
+    echo '$LNU_tmp1 = '"$LNU_tmp1"
+    LNU_tmp5=$(getprop persist.sys.kaiosinitlog.path)
+    if [ ! "$LNU_tmp5" == "" ] ; then
+      echo '$LNU_tmp5 = '"$LNU_tmp5"
+      /system/bin/logcat -b main -b system -b radio -b events -v time > "$LNU_tmp5"
+    fi
+  fi
+}
+function startjrdinitdmesg(){
+  LNU_tmp2=$(getprop persist.sys.initkeys.enable)
+  if [ "$LNU_tmp2" == "dmesginput" ] ; then
+    echo '$LNU_tmp2 = '"$LNU_tmp2"
+    LNU_tmp6=$(getprop persist.sys.kaiosinitlog.path)
+    if [ ! "$LNU_tmp6" == "" ] ; then
+      echo '$LNU_tmp6 = '"$LNU_tmp6"
+      /system/bin/cat /proc/kmsg > "$LNU_tmp6"
+    fi
+  fi
+}
+
+function startjrdinitqxdm(){
+  LNU_tmp3=$(getprop persist.sys.initkeys.enable)
+  if [ "$LNU_tmp3" == "qxdminput" ] ; then
+    echo '$LNU_tmp3 = '"$LNU_tmp3"
+    /system/bin/diag_mdlog -f /vendor/jrddiag.cfg -o /storage/emulated/kaioslog/initlog
+  fi
+}
+
+function startjrdinittcpdump(){
+  LNU_tmp4=$(getprop persist.sys.initkeys.enable)
+  if [ "$LNU_tmp4" == "tcpdumpinput" ] ; then
+    echo '$LNU_tmp4 = '"$LNU_tmp4"
+    /system/xbin/tcpdump -i any -p -vv -s 0 -w /storage/emulated/kaioslog/initlog/initlog_tcpdump.log
+  fi
+}
+function jrdinitlogservice(){
+  if [ "$(getprop persist.sys.kaiosinitlog.enable)" == "1" ] ; then
+    startjrdinitlogcat
+    startjrdinitdmesg
+    startjrdinitqxdm
+    startjrdinittcpdump
+  fi
+}
+jrdinitlogservice

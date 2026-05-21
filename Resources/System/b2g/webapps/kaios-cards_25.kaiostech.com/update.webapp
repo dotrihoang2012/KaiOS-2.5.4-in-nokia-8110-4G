@@ -1,0 +1,57 @@
+{
+  "version":"1.0.2",
+  "name": "Cards_2.5",
+  "description": "Gaia Cards",
+  "developer": {
+    "name": "KaiOS",
+    "url": "http://kaiostech.com"
+  },
+  "type": "certified",
+  "launch_path": "/index.html",
+  "fullscreen": false,
+  "role": "system",
+  "origin": "app://kaios-cards_25.kaiostech.com",
+  "permissions": {
+    "themeable":{},
+    "feature-detection": {},
+    "settings":{ "access": "readwrite" },
+    "softkey":{},
+    "mobileconnection":{},
+    "webapps-manage": {},
+    "wifi-manage":{},
+    "kaios-accounts": {},
+    "account-manager": {},
+    "datacall": {}
+  },
+  "activities": {
+    "open_card": {
+      "disposition": "window",
+      "returnValue": true,
+      "href": "/index.html"
+    }
+  },
+  "icons": {
+    "112": "/style/icons/cards_112.png"
+  },
+  "locales": {
+    "en-US": {
+      "name": "Cards",
+      "description": "Gaia Cards"
+    }
+  },
+  "chrome": {
+    "statusbar": "overlap"
+  },
+  "default_locale": "en-US",
+  "datastores-access": {
+    "cards_data": {
+      "readonly": false,
+      "description": "access cards data stores"
+    },
+    "cards_status": {
+      "readonly": false,
+      "description": "access cards and launcher general status."
+    }
+  },
+  "package_path": "/application.zip"
+}

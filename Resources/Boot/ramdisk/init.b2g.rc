@@ -1,0 +1,45 @@
+import /init.logmanager.rc
+import /init.bluetooth.rc
+import /init.ril.rc
+
+service gonksched /system/bin/gonksched
+    class main
+    user root
+
+service fakeappops /system/bin/fakeappops
+    class main
+    user root
+
+service b2g /system/bin/b2g.sh
+    class main
+    onrestart restart media
+
+service nfcd /system/bin/nfcd
+    disabled
+    class main
+    oneshot
+    socket nfcd stream 660 nfc nfc
+    user nfc
+    group system
+
+service radvd /system/bin/radvd -C /data/misc/radvd/radvd.conf \
+    -n -p /data/misc/radvd/radvd.pid
+    disabled
+    oneshot
+
+service api-daemon /system/bin/api-daemon.sh
+    class main
+    user root
+
+service updater-daemon /system/bin/updater-daemon.sh
+    class main
+    user root
+
+on post-fs-data
+    mkdir /data/misc/radvd 0770 system system
+
+on boot
+    exec /system/bin/rm -r /data/local/tmp/*
+    # set RLIMIT_NOFILE to increase soft limit from 1024(default) to 2048.
+    # Hard limit keeps default value(4096).
+    setrlimit 7 2048 4096

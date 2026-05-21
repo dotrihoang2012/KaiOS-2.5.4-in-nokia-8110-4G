@@ -1,0 +1,6 @@
+# for ffos/kaios
+service surfaceflinger /system/bin/surfaceflinger
+    class core
+    user system
+    group graphics drmrpc
+

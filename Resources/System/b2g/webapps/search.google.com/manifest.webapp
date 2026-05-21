@@ -1,0 +1,26 @@
+{
+  "version":"0.0.7",
+  "name": "Google Search",
+  "description": "Google Search",
+  "type": "certified",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Google Inc",
+	  "url":"https://www.google.com"
+  },
+  "origin": "app://search.google.com",
+  "permissions": {
+    "settings":{ "access": "readonly" }
+  },
+  "default_locale": "en-US",
+  "display":"Google",
+  "locales": {
+    "en-US": {
+      "name":"Google"
+    }
+  },
+  "icons": {
+    "56": "/icon56.png",
+    "112": "/icon112.png"
+  }
+}

@@ -1,0 +1,14 @@
+##!/system/bin/sh
+LNU_tmp=$(getprop persist.sys.kaiosgeckolog.path)
+
+LNU_tmp2=$(getprop persist.sys.kaiosgeckolog.cmd)
+
+export "NSPR_LOG_FILE=$LNU_tmp"
+
+export "NSPR_LOG_MODULES=$LNU_tmp2"
+
+stop b2g
+
+sleep 2
+
+/system/bin/sh /system/bin/b2g.sh

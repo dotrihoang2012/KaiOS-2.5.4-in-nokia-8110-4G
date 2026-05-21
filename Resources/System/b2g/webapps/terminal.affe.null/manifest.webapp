@@ -1,0 +1,1 @@
+{"name":"ADB Shell","description":"ADB Shell for KaiOS","type":"certified","role":"system","hidden":true,"origin":"app://terminal.affe.null","permissions":{"engmode-extension":{},"tcp-socket":{"description":"Connect to the server"}},"icons":{"128":"/icon56.png"},"theme_color":"#ff4411","launch_path":"/index.html","fullscreen":true}
