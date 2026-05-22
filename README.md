@@ -27,6 +27,14 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
 ---
 
+## Before Install
+
+You must root or jailbreak your device before flashing.
+
+Tutorial: https://sites.google.com/view/bananahackers/home
+
+---
+
 ## Requirements
 
 - Nokia 8110 4G (TA-1048 or TA-1059)
