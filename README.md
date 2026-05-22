@@ -82,14 +82,18 @@ adb devices
 adb reboot recovery
 ```
 
-**Step 2 — Sideload the package**
+**Step 2 — Wipe Data**
 
-In the recovery menu, select **"Apply update" → "Apply from ADB"**, then run:
+In the recovery menu, select **"Wipe data/factory reset"** and confirm.
+
+**Step 3 — Sideload the package**
+
+Select **"Apply update" → "Apply from ADB"**, then run:
 ```bash
 adb sideload kaios-2.5.4-nokia8110-signed.zip
 ```
 
-**Step 3 — Reboot**
+**Step 4 — Reboot**
 
 Once complete, select **"Reboot system now"** from the recovery menu.
 
@@ -113,6 +117,17 @@ python edl.py w boot boot.img --loader=8110.mbn
 **Step 3 — Reboot**
 ```bash
 python edl.py reset
+```
+
+**Step 4 — Wipe Data**
+
+After the device boots into recovery, select **"Wipe data/factory reset"** and confirm.
+
+**Step 5 — Boot into EDL again**
+
+Connect the device to your PC, then run:
+```bash
+adb reboot edl
 ```
 
 ---
