@@ -8,14 +8,13 @@ set USERDATA=/dev/block/bootdevice/by-name/userdata
 rem ── TOOLS ───────────────────────────────────────────────────────────────────
 set AIK_WIN=Tools\Android Image Kitchen\Windows
 set MAKE_EXT4FS=Tools\make_ext4fs\bin\make_ext4fs.exe
-set SIGNER_DIR=Tools\OTA Signer
+set SIGN_DIR=Tools\Sign
 set JAVA=Tools\Java-15\bin\java.exe
-set CLASSPATH=%SIGNER_DIR%\SignApk.jar;%SIGNER_DIR%\conscrypt-openjdk-uber.jar;%SIGNER_DIR%\bcprov-jdk15on-1.64.jar;%SIGNER_DIR%\bcpkix-jdk15on-1.64.jar
+set CLASSPATH=%SIGN_DIR%\signapk.jar;%SIGN_DIR%\conscrypt-openjdk-uber.jar;%SIGN_DIR%\bcprov-jdk15on-1.64.jar;%SIGN_DIR%\bcpkix-jdk15on-1.64.jar
 set CERT=Tools\Keys\testkey.x509.pem
 set KEY=Tools\Keys\testkey.pk8
 set ADB=Tools\adb\Windows\adb.exe
 set FFMPEG=Tools\ffmpeg.exe
-set SIGN_JAR=Tools\Sign\signapk.jar
 set UPDATE_BINARY=Tools\Sign\update-binary
 
 rem ── RESOURCES ───────────────────────────────────────────────────────────────

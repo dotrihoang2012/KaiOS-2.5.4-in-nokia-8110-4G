@@ -15,7 +15,7 @@ cp "$SCRIPTDIR/update-binary" "$TEMPDIR/META-INF/com/google/android/"
 pushd $TEMPDIR
 zip -9 -r update.zip .
 popd
-java -Xmx2048m -jar "$SCRIPTDIR/signapk.jar" -w "$KEYDIR/testkey.x509.pem" "$KEYDIR/testkey.pk8" "$TEMPDIR/update.zip" $2
+java -Xmx2048m -cp "$SCRIPTDIR/signapk.jar:$SCRIPTDIR/conscrypt-openjdk-uber.jar:$SCRIPTDIR/bcprov-jdk15on-1.64.jar:$SCRIPTDIR/bcpkix-jdk15on-1.64.jar" SignApk -w "$KEYDIR/testkey.x509.pem" "$KEYDIR/testkey.pk8" "$TEMPDIR/update.zip" $2
 rm -rf $TEMPDIR
 
 echo "Signed archive created at $2"
