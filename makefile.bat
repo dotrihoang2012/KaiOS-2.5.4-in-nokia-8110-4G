@@ -285,37 +285,37 @@ echo   KaiOS 2.5.4 -- Nokia 8110 4G Build System (Windows)
 echo   =====================================================
 echo.
 echo   BUILD
-echo     make build                Build all images (boot, recovery, system, splash)
-echo     make build-boot           Build boot.img  (via Android Image Kitchen)
-echo     make build-recovery       Build recovery.img
-echo     make build-system         Build system.img
-echo     make build-splash         Build splash.img
+echo     makefilebuild                Build all images (boot, recovery, system, splash)
+echo     makefilebuild-boot           Build boot.img  (via Android Image Kitchen)
+echo     makefilebuild-recovery       Build recovery.img
+echo     makefilebuild-system         Build system.img
+echo     makefilebuild-splash         Build splash.img
 echo.
 echo   BACKUP  (device must be connected)
-echo     make backup               Backup all partitions
-echo     make backup-boot          Backup boot
-echo     make backup-system        Backup system
-echo     make backup-recovery      Backup recovery
-echo     make backup-splash        Backup splash
+echo     makefilebackup               Backup all partitions
+echo     makefilebackup-boot          Backup boot
+echo     makefilebackup-system        Backup system
+echo     makefilebackup-recovery      Backup recovery
+echo     makefilebackup-splash        Backup splash
 echo.
 echo   DEPLOY  (requires Pris Recovery or Philz Touch Recovery)
-echo     make deploy               Flash all images
-echo     make deploy-boot          Flash boot.img
-echo     make deploy-recovery      Flash recovery.img
-echo     make deploy-system        Flash system.img
-echo     make deploy-splash        Flash splash.img
+echo     makefiledeploy               Flash all images
+echo     makefiledeploy-boot          Flash boot.img
+echo     makefiledeploy-recovery      Flash recovery.img
+echo     makefiledeploy-system        Flash system.img
+echo     makefiledeploy-splash        Flash splash.img
 echo.
 echo   FLASH
-echo     make flash-recovery       Reboot device into recovery
-echo     make sideload             Sideload INPUT zip via ADB
-echo     make wipe                 Wipe data partition
+echo     makefileflash-recovery       Reboot device into recovery
+echo     makefilesideload             Sideload INPUT zip via ADB
+echo     makefilewipe                 Wipe data partition
 echo.
 echo   PACKAGE
-echo     make sign                 Sign INPUT zip with test-keys
-echo     make build-installer      Build OTA installer package
-echo     set VERSION=1.0.0 ^& make build-installer
+echo     makefilesign                 Sign INPUT zip with test-keys
+echo     makefilebuild-installer      Build OTA installer package
+echo     set VERSION=1.0.0 ^& makefile build-installer
 echo.
 echo   CLEAN
-echo     make clean                Remove all built images
+echo     makefileclean                Remove all built images
 echo.
 goto :eof
