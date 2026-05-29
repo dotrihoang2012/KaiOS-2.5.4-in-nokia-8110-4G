@@ -15,7 +15,6 @@ Tools/Android Image Kitchen/Windows/ramdisk-new.cpio*
 Tools/Android Image Kitchen/Linux/ramdisk-new.cpio*
 
 # Large binaries (exceed GitHub 100MB limit)
-Tools/ffmpeg/
 Tools/EDL (for Windows only)/V17 nokia 8110 4G(stock)/
 Tools/Java/Windows/
 Tools/Java/Linux/
