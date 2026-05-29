@@ -84,6 +84,8 @@ Requires Gerda Recovery or Philz Touch Recovery.
 |---|---|
 | `clean` | Remove all built images |
 
+## Building
+
 ## Supported builds as of now
 
 - `boot`
