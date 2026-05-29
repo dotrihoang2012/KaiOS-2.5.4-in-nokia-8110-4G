@@ -1,6 +1,15 @@
+# ── CONFIG ────────────────────────────────────────────────────────────────────
+TARGET      := 8110
+PERSISTDIR  := /data/media/0
+USERDATA    := /dev/block/bootdevice/by-name/userdata
+SHELL       := /bin/bash
+
+VERSION     ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILDID     := $(shell bash -c 'echo $$RANDOM')
+
 # ── TOOLS ─────────────────────────────────────────────────────────────────────
-ADB         := Tools/adb/Linux/adb
-MKBOOTIMG   := Tools/Android\ Image\ Kitchen/Linux/bin/mkbootimg
+AIK_LINUX   := Tools/Android\ Image\ Kitchen/Linux
+AIK_WIN     := Tools/Android\ Image\ Kitchen/Windows
 MAKE_EXT4FS := Tools/make_ext4fs/bin/make_ext4fs
 SIGN        := Tools/Sign/sign.sh
 SIGNER_DIR  := Tools/OTA\ Signer
@@ -8,153 +17,203 @@ JAVA        := java
 CLASSPATH   := $(SIGNER_DIR)/signapk.jar:$(SIGNER_DIR)/conscrypt-openjdk-uber.jar:$(SIGNER_DIR)/bcprov-jdk15on-1.64.jar:$(SIGNER_DIR)/bcpkix-jdk15on-1.64.jar
 CERT        := Tools/Keys/testkey.x509.pem
 KEY         := Tools/Keys/testkey.pk8
+ADB         := Tools/adb/Linux/adb
 
 # ── RESOURCES ─────────────────────────────────────────────────────────────────
-BOOT_RAMDISK    := Resources/Boot/ramdisk
-BOOT_SPLIT      := Resources/Boot/split_img
-RECOVERY_RAMDISK := Resources/Recovery/ramdisk
-RECOVERY_SPLIT  := Resources/Recovery/split_img
+BOOT_DIR        := Resources/Boot
+RECOVERY_DIR    := Resources/Recovery
 SYSTEM_DIR      := Resources/System
 SPLASH_DIR      := Resources/Splash
+BLOBS_DIR       := Resources/Blobs/$(TARGET)
 OTA_DIR         := Resources/Zip\ OTA
 
-# ── BOOT IMAGE PARAMETERS ─────────────────────────────────────────────────────
-BOOT_CMDLINE        := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1 earlyprintk androidboot.selinux=permissive
-BOOT_BASE           := 0x80000000
-BOOT_PAGESIZE       := 2048
-BOOT_KERNEL_OFFSET  := 0x00008000
-BOOT_RAMDISK_OFFSET := 0x01000000
-BOOT_SECOND_OFFSET  := 0x00f00000
-BOOT_TAGS_OFFSET    := 0x00000100
-
-# ── SYSTEM IMAGE ──────────────────────────────────────────────────────────────
-SYSTEM_SIZE := 1073741824
+BASE_SYSTEM_SIZE := 838860800
 
 # ── OUTPUT ────────────────────────────────────────────────────────────────────
-VERSION     ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-RANDOMID    := $(shell cat /dev/urandom | tr -dc 'a-f0-9' | head -c 8)
 BACKUP_DIR  := works/backups
 INPUT       ?= input.zip
 OUTPUT      ?= $(basename $(INPUT))-signed.zip
 
-.PHONY: all build build-boot build-system build-recovery build-splash \
-        backup backup-boot backup-system backup-recovery backup-splash \
-        deploy deploy-boot deploy-system deploy-recovery deploy-splash \
-        flash-recovery sideload sign build-installer wipe help
+.PHONY: all build build-boot build-system build-recovery build-splash repack-apps \
+        backup backup-boot backup-system backup-recovery backup-splash backup-modem backup-radio \
+        deploy deploy-boot deploy-system deploy-recovery deploy-splash deploy-modem deploy-radio \
+        flash-recovery sideload sign build-installer wipe \
+        clean clean-boot clean-system clean-recovery clean-splash clean-installer help
 
-all: help
+all: build backup deploy
 
 # ── BUILD ─────────────────────────────────────────────────────────────────────
 
-build: build-boot build-recovery build-system build-splash
-	@echo "All images built successfully."
+build: build-boot build-recovery build-splash build-system
 
-build-boot:
+build-boot: clean-boot
 	@echo "Building boot.img..."
-	cd $(BOOT_RAMDISK) && find . | cpio -o -H newc | gzip > /tmp/boot-ramdisk.gz
-	$(MKBOOTIMG) \
-		--kernel $(BOOT_SPLIT)/boot.img-kernel \
-		--ramdisk /tmp/boot-ramdisk.gz \
-		--cmdline "$(BOOT_CMDLINE)" \
-		--base $(BOOT_BASE) \
-		--pagesize $(BOOT_PAGESIZE) \
-		--kernel_offset $(BOOT_KERNEL_OFFSET) \
-		--ramdisk_offset $(BOOT_RAMDISK_OFFSET) \
-		--second_offset $(BOOT_SECOND_OFFSET) \
-		--tags_offset $(BOOT_TAGS_OFFSET) \
-		--output boot.img
-	@rm -f /tmp/boot-ramdisk.gz
+	@cp -r $(BOOT_DIR)/split_img $(AIK_LINUX)/split_img
+	@cp -r $(BOOT_DIR)/ramdisk   $(AIK_LINUX)/ramdisk
+	@cd $(AIK_LINUX) && bash repackimg.sh
+	@mv $(AIK_LINUX)/image-new.img boot.img
+	@rm -rf $(AIK_LINUX)/split_img $(AIK_LINUX)/ramdisk $(AIK_LINUX)/ramdisk-new.cpio*
 	@echo "-> boot.img done"
 
-build-recovery:
+build-recovery: clean-recovery
 	@echo "Building recovery.img..."
-	cd $(RECOVERY_RAMDISK) && find . | cpio -o -H newc | gzip > /tmp/recovery-ramdisk.gz
-	$(MKBOOTIMG) \
-		--kernel $(RECOVERY_SPLIT)/recovery.img-kernel \
-		--ramdisk /tmp/recovery-ramdisk.gz \
-		--cmdline "$(BOOT_CMDLINE)" \
-		--base $(BOOT_BASE) \
-		--pagesize $(BOOT_PAGESIZE) \
-		--kernel_offset $(BOOT_KERNEL_OFFSET) \
-		--ramdisk_offset $(BOOT_RAMDISK_OFFSET) \
-		--second_offset $(BOOT_SECOND_OFFSET) \
-		--tags_offset $(BOOT_TAGS_OFFSET) \
-		--output recovery.img
-	@rm -f /tmp/recovery-ramdisk.gz
+	@cp -r $(RECOVERY_DIR)/split_img $(AIK_LINUX)/split_img
+	@cp -r $(RECOVERY_DIR)/ramdisk   $(AIK_LINUX)/ramdisk
+	@cd $(AIK_LINUX) && bash repackimg.sh
+	@mv $(AIK_LINUX)/image-new.img recovery.img
+	@rm -rf $(AIK_LINUX)/split_img $(AIK_LINUX)/ramdisk $(AIK_LINUX)/ramdisk-new.cpio*
 	@echo "-> recovery.img done"
 
-build-system:
+repack-apps:
+	@echo "Packaging omni.ja..."
+	@cd $(SYSTEM_DIR)/b2g/omni_src && zip -9 ../omni.ja -r . && cd - && rm -rf $(SYSTEM_DIR)/b2g/omni_src
+	@echo "Packaging boot animation..."
+	@rm -f $(SYSTEM_DIR)/media/bootanimation.zip
+	@cd $(SYSTEM_DIR)/media/bootanimation_src && zip -0qry -i \*.txt \*.png \*.wav @ ../bootanimation.zip ./* && cd - && rm -rf $(SYSTEM_DIR)/media/bootanimation_src
+	@echo "Packaging WebApps..."
+	@cd $(SYSTEM_DIR)/b2g/webapps && find . -type d -maxdepth 1 -mindepth 1 | while read WEBAPP; do \
+	  echo "Packaging $$WEBAPP"; \
+	  if [ -d "$$WEBAPP/src" ]; then \
+	    cd "$$WEBAPP/src"; zip -9 ../application.zip -r .; cp manifest.webapp ../; cd -; rm -rf "$$WEBAPP/src"; \
+	  fi; \
+	done
+
+build-system: repack-apps
 	@echo "Building system.img..."
-	$(MAKE_EXT4FS) -s -l $(SYSTEM_SIZE) -a system system.img $(SYSTEM_DIR)
+	$(MAKE_EXT4FS) -a '/system' -L 'system' -j 0 -l $(BASE_SYSTEM_SIZE) system.img $(SYSTEM_DIR)/
 	@echo "-> system.img done"
 
-build-splash:
+build-splash: clean-splash
 	@echo "Building splash.img..."
-	ffmpeg -vcodec png -i $(SPLASH_DIR)/logo.png \
+	@ffmpeg -vcodec png -i $(SPLASH_DIR)/logo.png \
 		-vcodec rawvideo -f rawvideo -pix_fmt bgr565 -s 240x320 -y /tmp/splash-raw.bin
-	cat $(SPLASH_DIR)/logohdr.bin /tmp/splash-raw.bin > splash.img
+	@cat $(SPLASH_DIR)/logohdr.bin /tmp/splash-raw.bin > splash.img
 	@rm -f /tmp/splash-raw.bin
 	@echo "-> splash.img done"
 
 # ── BACKUP ────────────────────────────────────────────────────────────────────
 
-backup: backup-boot backup-system backup-recovery backup-splash
+backup: backup-boot backup-recovery backup-splash backup-system backup-modem backup-radio
 
 backup-boot:
 	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell dd if=/dev/block/bootdevice/by-name/boot of=/sdcard/boot.img
-	$(ADB) pull /sdcard/boot.img $(BACKUP_DIR)/boot.$(RANDOMID).img
-	$(ADB) shell rm /sdcard/boot.img
-	@echo "-> Backed up to $(BACKUP_DIR)/boot.$(RANDOMID).img"
-
-backup-system:
-	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell dd if=/dev/block/bootdevice/by-name/system of=/sdcard/system.img
-	$(ADB) pull /sdcard/system.img $(BACKUP_DIR)/system.$(RANDOMID).img
-	$(ADB) shell rm /sdcard/system.img
-	@echo "-> Backed up to $(BACKUP_DIR)/system.$(RANDOMID).img"
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/boot.backup.img if=/dev/block/bootdevice/by-name/boot bs=2048
+	$(ADB) pull $(PERSISTDIR)/boot.backup.img $(BACKUP_DIR)/boot.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/boot.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/boot.$(BUILDID).img"
 
 backup-recovery:
 	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell dd if=/dev/block/bootdevice/by-name/recovery of=/sdcard/recovery.img
-	$(ADB) pull /sdcard/recovery.img $(BACKUP_DIR)/recovery.$(RANDOMID).img
-	$(ADB) shell rm /sdcard/recovery.img
-	@echo "-> Backed up to $(BACKUP_DIR)/recovery.$(RANDOMID).img"
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/recovery.backup.img if=/dev/block/bootdevice/by-name/recovery bs=2048
+	$(ADB) pull $(PERSISTDIR)/recovery.backup.img $(BACKUP_DIR)/recovery.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/recovery.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/recovery.$(BUILDID).img"
+
+backup-system:
+	@mkdir -p $(BACKUP_DIR)
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/system.backup.img if=/dev/block/bootdevice/by-name/system bs=2048
+	$(ADB) pull $(PERSISTDIR)/system.backup.img $(BACKUP_DIR)/system.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/system.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/system.$(BUILDID).img"
 
 backup-splash:
 	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell dd if=/dev/block/bootdevice/by-name/splash of=/sdcard/splash.img
-	$(ADB) pull /sdcard/splash.img $(BACKUP_DIR)/splash.$(RANDOMID).img
-	$(ADB) shell rm /sdcard/splash.img
-	@echo "-> Backed up to $(BACKUP_DIR)/splash.$(RANDOMID).img"
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/splash.backup.img if=/dev/block/bootdevice/by-name/splash bs=2048
+	$(ADB) pull $(PERSISTDIR)/splash.backup.img $(BACKUP_DIR)/splash.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/splash.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/splash.$(BUILDID).img"
+
+backup-modem:
+	@mkdir -p $(BACKUP_DIR)
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/modem.backup.img if=/dev/block/bootdevice/by-name/modem bs=2048
+	$(ADB) pull $(PERSISTDIR)/modem.backup.img $(BACKUP_DIR)/modem.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/modem.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/modem.$(BUILDID).img"
+
+backup-radio:
+	@mkdir -p $(BACKUP_DIR)
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) shell dd of=$(PERSISTDIR)/fsg.backup.img if=/dev/block/bootdevice/by-name/fsg bs=2048
+	$(ADB) pull $(PERSISTDIR)/fsg.backup.img $(BACKUP_DIR)/fsg.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/fsg.backup.img
+	$(ADB) shell dd of=$(PERSISTDIR)/modemst1.backup.img if=/dev/block/bootdevice/by-name/modemst1 bs=2048
+	$(ADB) pull $(PERSISTDIR)/modemst1.backup.img $(BACKUP_DIR)/modemst1.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/modemst1.backup.img
+	$(ADB) shell dd of=$(PERSISTDIR)/modemst2.backup.img if=/dev/block/bootdevice/by-name/modemst2 bs=2048
+	$(ADB) pull $(PERSISTDIR)/modemst2.backup.img $(BACKUP_DIR)/modemst2.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/modemst2.backup.img
+	$(ADB) shell dd of=$(PERSISTDIR)/rpm.backup.img if=/dev/block/bootdevice/by-name/rpm bs=2048
+	$(ADB) pull $(PERSISTDIR)/rpm.backup.img $(BACKUP_DIR)/rpm.$(BUILDID).img
+	$(ADB) shell rm -f $(PERSISTDIR)/rpm.backup.img
+	@echo "-> Backed up to $(BACKUP_DIR)/{fsg,modemst1,modemst2,rpm}.$(BUILDID).img"
 
 # ── DEPLOY ────────────────────────────────────────────────────────────────────
 
-deploy: deploy-boot deploy-recovery deploy-system deploy-splash
+deploy: deploy-boot deploy-recovery deploy-splash deploy-system deploy-modem deploy-radio
 
 deploy-boot:
-	$(ADB) push boot.img /sdcard/boot.img
-	$(ADB) shell dd if=/sdcard/boot.img of=/dev/block/bootdevice/by-name/boot
-	$(ADB) shell rm /sdcard/boot.img
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push boot.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/boot.img of=/dev/block/bootdevice/by-name/boot bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/boot.img
 	@echo "-> boot.img deployed"
 
 deploy-recovery:
-	$(ADB) push recovery.img /sdcard/recovery.img
-	$(ADB) shell dd if=/sdcard/recovery.img of=/dev/block/bootdevice/by-name/recovery
-	$(ADB) shell rm /sdcard/recovery.img
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push recovery.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/recovery.img of=/dev/block/bootdevice/by-name/recovery bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/recovery.img
 	@echo "-> recovery.img deployed"
 
 deploy-system:
-	$(ADB) push system.img /sdcard/system.img
-	$(ADB) shell dd if=/sdcard/system.img of=/dev/block/bootdevice/by-name/system
-	$(ADB) shell rm /sdcard/system.img
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push system.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/system.img of=/dev/block/bootdevice/by-name/system bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/system.img
 	@echo "-> system.img deployed"
 
 deploy-splash:
-	$(ADB) push splash.img /sdcard/splash.img
-	$(ADB) shell dd if=/sdcard/splash.img of=/dev/block/bootdevice/by-name/splash
-	$(ADB) shell rm /sdcard/splash.img
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push splash.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/splash.img of=/dev/block/bootdevice/by-name/splash bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/splash.img
 	@echo "-> splash.img deployed"
+
+deploy-modem:
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push $(BLOBS_DIR)/modem.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/modem.img of=/dev/block/bootdevice/by-name/modem bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/modem.img
+	@echo "-> modem.img deployed"
+
+deploy-radio:
+	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
+	$(ADB) shell mkdir -p $(PERSISTDIR)/
+	$(ADB) push $(BLOBS_DIR)/fsg.bin $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/fsg.bin of=/dev/block/bootdevice/by-name/fsg bs=2048
+	$(ADB) shell dd if=/dev/zero of=/dev/block/bootdevice/by-name/modemst1 bs=2048
+	$(ADB) shell dd if=/dev/zero of=/dev/block/bootdevice/by-name/modemst2 bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/fsg.bin
+	$(ADB) push $(BLOBS_DIR)/rpm.img $(PERSISTDIR)/
+	$(ADB) shell dd if=$(PERSISTDIR)/rpm.img of=/dev/block/bootdevice/by-name/rpm bs=2048
+	$(ADB) shell rm $(PERSISTDIR)/rpm.img
+	@echo "-> Radio images deployed"
 
 # ── FLASH ─────────────────────────────────────────────────────────────────────
 
@@ -172,10 +231,41 @@ wipe:
 sign:
 	$(JAVA) -cp "$(CLASSPATH)" SignApk -w $(CERT) $(KEY) $(INPUT) $(OUTPUT)
 
-build-installer:
-	@echo "Building OTA installer package..."
-	bash $(SIGN) $(OTA_DIR) Nokia_8110_4G_KaiOS2.5.4_$(VERSION).zip
+build-installer: clean build-system build-boot build-recovery build-splash
+	@mkdir -p works/installer
+	@cp -r $(OTA_DIR)/* works/installer/
+	@mv system.img works/installer/
+	@mv boot.img works/installer/
+	@mv recovery.img works/installer/
+	@mv splash.img works/installer/
+	@cp $(BLOBS_DIR)/modem.img works/installer/
+	@cp $(BLOBS_DIR)/fsg.bin works/installer/
+	@cp $(BLOBS_DIR)/rpm.img works/installer/
+	@bash $(SIGN) works/installer Nokia_8110_4G_KaiOS2.5.4_$(VERSION).zip
+	@rm -rf works/installer
 	@echo "-> Nokia_8110_4G_KaiOS2.5.4_$(VERSION).zip done"
+
+# ── CLEAN ─────────────────────────────────────────────────────────────────────
+
+clean: clean-boot clean-recovery clean-system clean-splash clean-installer
+
+clean-boot:
+	@rm -f boot.img
+	@rm -rf $(AIK_LINUX)/split_img $(AIK_LINUX)/ramdisk $(AIK_LINUX)/ramdisk-new.cpio* $(AIK_LINUX)/image-new.img
+
+clean-recovery:
+	@rm -f recovery.img
+	@rm -rf $(AIK_LINUX)/split_img $(AIK_LINUX)/ramdisk $(AIK_LINUX)/ramdisk-new.cpio* $(AIK_LINUX)/image-new.img
+
+clean-system:
+	@rm -f system.img
+	@rm -rf works/system
+
+clean-splash:
+	@rm -f splash.img
+
+clean-installer:
+	@rm -rf works/installer Nokia_8110_4G_KaiOS2.5.4_*.zip
 
 # ── HELP ──────────────────────────────────────────────────────────────────────
 
@@ -186,24 +276,28 @@ help:
 	@echo ""
 	@echo "  BUILD"
 	@echo "    make build                Build all images (boot, recovery, system, splash)"
-	@echo "    make build-boot           Build boot.img"
+	@echo "    make build-boot           Build boot.img  (via Android Image Kitchen)"
 	@echo "    make build-recovery       Build recovery.img"
 	@echo "    make build-system         Build system.img"
 	@echo "    make build-splash         Build splash.img"
 	@echo ""
 	@echo "  BACKUP  (device must be connected)"
 	@echo "    make backup               Backup all partitions"
-	@echo "    make backup-boot          Backup boot partition"
-	@echo "    make backup-system        Backup system partition"
-	@echo "    make backup-recovery      Backup recovery partition"
-	@echo "    make backup-splash        Backup splash partition"
+	@echo "    make backup-boot          Backup boot"
+	@echo "    make backup-system        Backup system"
+	@echo "    make backup-recovery      Backup recovery"
+	@echo "    make backup-splash        Backup splash"
+	@echo "    make backup-modem         Backup modem"
+	@echo "    make backup-radio         Backup fsg/modemst1/modemst2/rpm"
 	@echo ""
 	@echo "  DEPLOY  (requires Pris Recovery or Philz Touch Recovery)"
-	@echo "    make deploy               Flash all images to device"
+	@echo "    make deploy               Flash all images"
 	@echo "    make deploy-boot          Flash boot.img"
 	@echo "    make deploy-recovery      Flash recovery.img"
 	@echo "    make deploy-system        Flash system.img"
 	@echo "    make deploy-splash        Flash splash.img"
+	@echo "    make deploy-modem         Flash modem.img"
+	@echo "    make deploy-radio         Flash fsg/modemst1/modemst2/rpm"
 	@echo ""
 	@echo "  FLASH"
 	@echo "    make flash-recovery       Reboot device into recovery"
@@ -214,4 +308,7 @@ help:
 	@echo "    make sign INPUT=f.zip     Sign a ZIP with test-keys"
 	@echo "    make build-installer      Build OTA installer package"
 	@echo "    make build-installer VERSION=1.0.0"
+	@echo ""
+	@echo "  CLEAN"
+	@echo "    make clean                Remove all built images"
 	@echo ""
