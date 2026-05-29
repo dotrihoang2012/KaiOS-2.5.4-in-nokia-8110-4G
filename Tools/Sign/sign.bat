@@ -12,6 +12,7 @@ set KEYDIR=%SCRIPTDIR%\..\Keys
 set JAVA=%SCRIPTDIR%\..\..\Tools\Java-15\bin\java.exe
 if not exist "%JAVA%" set JAVA=java
 set TEMPDIR=%SCRIPTDIR%\tmp
+set TEMP_ZIP=%TEMP%\nokia_sign_%RANDOM%.zip
 
 if exist "%TEMPDIR%" rmdir /s /q "%TEMPDIR%"
 mkdir "%TEMPDIR%"
@@ -19,10 +20,10 @@ xcopy /E /I /Y "%~1\*" "%TEMPDIR%\" >nul
 if not exist "%TEMPDIR%\META-INF\com\google\android" mkdir "%TEMPDIR%\META-INF\com\google\android"
 copy /Y "%SCRIPTDIR%\update-binary" "%TEMPDIR%\META-INF\com\google\android\" >nul
 
-set TEMP_ZIP=%TEMPDIR%\update.zip
 powershell -NoProfile -Command "Add-Type -Assembly System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('%TEMPDIR%', '%TEMP_ZIP%', 'Optimal', $false)"
 
 "%JAVA%" -Xmx2048m -cp "%SCRIPTDIR%\signapk.jar;%SCRIPTDIR%\conscrypt-openjdk-uber.jar;%SCRIPTDIR%\bcprov-jdk15on-1.64.jar;%SCRIPTDIR%\bcpkix-jdk15on-1.64.jar" SignApk -w "%KEYDIR%\testkey.x509.pem" "%KEYDIR%\testkey.pk8" "%TEMP_ZIP%" "%~2"
 
+del /f /q "%TEMP_ZIP%"
 rmdir /s /q "%TEMPDIR%"
 echo Signed archive created at %~2
