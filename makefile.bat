@@ -60,7 +60,11 @@ xcopy /E /I /Y "%BOOT_DIR%\ramdisk"   "%AIK_WIN%\ramdisk\"   >nul
 pushd "%AIK_WIN%"
 call repackimg.bat
 popd
-move /Y "%AIK_WIN%\image-new.img" boot.img
+if exist "%AIK_WIN%\image-new.img" (
+    move /Y "%AIK_WIN%\image-new.img" boot.img
+) else if exist "%AIK_WIN%\unsigned-new.img" (
+    move /Y "%AIK_WIN%\unsigned-new.img" boot.img
+)
 rmdir /s /q "%AIK_WIN%\split_img" 2>nul
 rmdir /s /q "%AIK_WIN%\ramdisk"   2>nul
 del /f /q "%AIK_WIN%\ramdisk-new.cpio" 2>nul
@@ -75,7 +79,11 @@ xcopy /E /I /Y "%RECOVERY_DIR%\ramdisk"   "%AIK_WIN%\ramdisk\"   >nul
 pushd "%AIK_WIN%"
 call repackimg.bat
 popd
-move /Y "%AIK_WIN%\image-new.img" recovery.img
+if exist "%AIK_WIN%\image-new.img" (
+    move /Y "%AIK_WIN%\image-new.img" recovery.img
+) else if exist "%AIK_WIN%\unsigned-new.img" (
+    move /Y "%AIK_WIN%\unsigned-new.img" recovery.img
+)
 rmdir /s /q "%AIK_WIN%\split_img" 2>nul
 rmdir /s /q "%AIK_WIN%\ramdisk"   2>nul
 del /f /q "%AIK_WIN%\ramdisk-new.cpio" 2>nul
@@ -84,7 +92,7 @@ goto :eof
 
 :build-system
 echo Building system.img...
-"%MAKE_EXT4FS%" -a "/system" -L "system" -j 0 -l %BASE_SYSTEM_SIZE% system.img "%SYSTEM_DIR%\"
+"%MAKE_EXT4FS%" -a "/system" -L "system" -j 0 -l %BASE_SYSTEM_SIZE% system.img "%SYSTEM_DIR%"
 echo -^> system.img done
 goto :eof
 
