@@ -204,9 +204,7 @@ clean-installer:
 # ── HELP ──────────────────────────────────────────────────────────────────────
 
 help:
-	@echo ""
-	@echo "  KaiOS 2.5.4 — Nokia 8110 4G Build System"
-	@echo "  =========================================="
+	@echo "Usage:"
 	@echo ""
 	@echo "  BUILD"
 	@echo "    makefile build                Build all images (boot, recovery, system, splash)"
