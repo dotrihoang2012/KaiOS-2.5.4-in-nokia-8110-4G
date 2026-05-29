@@ -218,7 +218,9 @@ goto :eof
 
 :build-installer
 call :clean
-call :build-system
+echo Building system.img...
+"%MAKE_EXT4FS%" -a "/system" -L "system" -j 0 -l %BASE_SYSTEM_SIZE% system.img "%SYSTEM_DIR%"
+echo -^> system.img done
 call :build-boot
 call :build-recovery
 call :build-splash
@@ -233,7 +235,7 @@ copy /Y "%UPDATE_BINARY%" "works\installer\META-INF\com\google\android\" >nul
 set INSTALLER_NAME=Nokia_8110_4G_KaiOS2.5.4_%VERSION%
 set TEMP_ZIP=%TEMP%\%INSTALLER_NAME%_unsigned.zip
 powershell -NoProfile -Command "Add-Type -Assembly System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('works\installer', '%TEMP_ZIP%', 'Optimal', $false)"
-%JAVA% -Xmx2048m -jar "%SIGN_JAR%" -w "%CERT%" "%KEY%" "%TEMP_ZIP%" "%INSTALLER_NAME%.zip"
+%JAVA% -cp "%CLASSPATH%" SignApk -w "%CERT%" "%KEY%" "%TEMP_ZIP%" "%INSTALLER_NAME%.zip"
 del /f /q "%TEMP_ZIP%"
 rmdir /s /q works\installer
 echo -^> %INSTALLER_NAME%.zip done
