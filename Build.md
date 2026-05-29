@@ -4,6 +4,20 @@
 
 **Linux**
 
+Install Make if not already present:
+
+```
+sudo apt install make
+```
+
+Make the Makefile executable:
+
+```
+chmod +x Makefile
+```
+
+Then run:
+
 ```
 make <target>
 ```
