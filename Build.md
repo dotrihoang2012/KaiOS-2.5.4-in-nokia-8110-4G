@@ -1,110 +1,71 @@
 # Building from Source
 
-## Dependency Requirements
+## Usage
 
-**Overall:**
-- ADB
-- Bash 3+
-- Make
-- JRE 8
+**Linux**
 
-**For building the boot image:**
-- Make, GCC
-
-**For building the system image:**
-- `make_ext4fs` (compiled during the build process)
-
-**For building the splash image:**
-- FFmpeg
-
-## Building the Images
-
-```bash
-make build
+```
+make <target>
 ```
 
-Files called `boot.img`, `system.img`, `splash.img` and `recovery.img` will be created in the project directory.
+**Windows**
 
-You can also individually run `make build-boot`, `make build-system` and `make build-splash` to build only the parts you need right now.
-
-## Backing up Existing Partitions
-
-```bash
-make backup
+```
+makefile <target>
 ```
 
-Files called `boot.$RANDOMID.img`, `system.$RANDOMID.img`, `splash.$RANDOMID.img` and `recovery.$RANDOMID.img` will be created in the `works/backups/` directory.
-The RANDOMID value will be consistent across all backup images.
+### BUILD
 
-You can also individually run `make backup-boot`, `make backup-system`, `make backup-splash` and `make backup-recovery` to backup only the parts you need right now.
+| Target | Description |
+|---|---|
+| `build` | Build all images (boot, recovery, system, splash) |
+| `build-boot` | Build boot.img via Android Image Kitchen |
+| `build-recovery` | Build recovery.img |
+| `build-system` | Build system.img |
+| `build-splash` | Build splash.img |
 
-## Deploying the Images to the Device
+### BACKUP
 
-Requires **Pris Recovery (Gerda Recovery)** or **Philz Touch Recovery**. Boot into recovery then:
+Device must be connected via ADB.
 
-```bash
-make deploy
-```
+| Target | Description |
+|---|---|
+| `backup` | Backup all partitions |
+| `backup-boot` | Backup boot partition |
+| `backup-recovery` | Backup recovery partition |
+| `backup-system` | Backup system partition |
+| `backup-splash` | Backup splash partition |
 
-You can also individually run `make deploy-boot`, `make deploy-system`, `make deploy-recovery` and `make deploy-splash` to flash only the parts you need right now.
+### DEPLOY
 
-## Building the Update Package for Recovery
+Requires Gerda Recovery or Philz Touch Recovery.
 
-Alternatively, you can also build a ready-made update.zip for the HMD firmware v12 or for Pris Recovery (highly recommended) over any stock system version.
+| Target | Description |
+|---|---|
+| `deploy` | Flash all images |
+| `deploy-boot` | Flash boot.img |
+| `deploy-recovery` | Flash recovery.img |
+| `deploy-system` | Flash system.img |
+| `deploy-splash` | Flash splash.img |
 
-```bash
-make build-installer
-```
+### FLASH
 
-or
+| Target | Description |
+|---|---|
+| `flash-recovery` | Reboot device into recovery |
+| `sideload` | Sideload a signed ZIP via ADB (`INPUT=file.zip`) |
+| `wipe` | Wipe data partition |
 
-```bash
-make VERSION=${ver} build-installer
-```
+### PACKAGE
 
-If the `VERSION` variable is omitted, short hash of the recent commit will be used instead. Same thing goes for GitLab CI automated build.
+| Target | Description |
+|---|---|
+| `sign` | Sign a ZIP with test-keys (`INPUT=file.zip`) |
+| `build-installer` | Build OTA installer package |
+| `build-installer VERSION=1.0.0` | Build installer with specific version tag |
 
-A file called `Nokia_8110_4G_KaiOS2.5.4_${ver}.zip` will be created in the project directory.
+### CLEAN
 
-Note that this file will not install Gerda Recovery! And if Gerda Recovery isn't installed, the update can run only from stock v12 and lower recoveries.
-
-To install the image, run `adb reboot recovery`, select "Wipe data/factory reset" and then "Install update from ADB", afterwards run:
-
-```bash
-adb sideload Nokia_8110_4G_KaiOS2.5.4_${ver}.zip
-```
-
-And wait until the process completes. Afterwards, reboot the phone to see your newly installed OS.
-
-## Changing Boot Splash Image
-
-Note: this guide only focuses on the splash partition image (which is "Powered by KaiOS" by default). The system one ("Nokia") is stored in `system` partition.
-
-Prerequisites: `imagemagick` and/or `ffmpeg` package installed. Currently `ffmpeg` is required.
-
-### Boot Splash Format Description
-
-- First 8 bytes (0 to 7): `SPLASH!!` (or `53 50 4C 41 53 48 21 21` in hex)
-- Bytes 8 to 11: 32-bit width, little-endian (for 8110: `f0 00 00 00`, equals to 240)
-- Bytes 12 to 15: 32-bit height, little-endian (for 8110: `40 01 00 00`, equals to 320)
-- Bytes 16 to 19: 32-bit image type, little-endian (for 8110: `00 00 00 00`)
-- Bytes 20 to 23: 32-bit 512-block count, little endian (for 8110: `2c 01 00 00`, equals to 240x320x2/512 = 300)
-- Next 488 bytes: zero-filled
-- Bytes from 512: raw 16-bit image data in BGR565LE format, length must be 153600 bytes
-
-The header suitable for 8110 is stored in the `Resources/Splash/logohdr.bin` file.
-
-### Manual Steps to Build the Splash Image
-
-1. Place your PNG with the logo to `Resources/Splash/logo.png`.
-2. Run:
-
-```bash
-ffmpeg -vcodec png -i Resources/Splash/logo.png -vcodec rawvideo -f rawvideo -pix_fmt bgr565 -s 240x320 -y tmp.bin
-cat Resources/Splash/logohdr.bin tmp.bin > splash.img
-rm tmp.bin
-```
-
-### Automatic Building
-
-Run `make build` or place a 240x320 PNG at `Resources/Splash/logo.png`.
+| Target | Description |
+|---|---|
+| `clean` | Remove all built images |
