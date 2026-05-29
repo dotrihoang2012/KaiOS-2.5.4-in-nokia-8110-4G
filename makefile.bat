@@ -14,7 +14,7 @@ set CLASSPATH=%SIGN_DIR%\signapk.jar;%SIGN_DIR%\conscrypt-openjdk-uber.jar;%SIGN
 set CERT=Tools\Keys\testkey.x509.pem
 set KEY=Tools\Keys\testkey.pk8
 set ADB=Tools\adb\Windows\adb.exe
-set FFMPEG=Tools\ffmpeg.exe
+set FFMPEG=Tools\ffmpeg\ffmpeg.exe
 set UPDATE_BINARY=Tools\Sign\update-binary
 
 rem ── RESOURCES ───────────────────────────────────────────────────────────────

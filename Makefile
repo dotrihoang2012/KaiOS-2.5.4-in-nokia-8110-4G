@@ -70,7 +70,7 @@ build-system:
 
 build-splash: clean-splash
 	@echo "Building splash.img..."
-	@ffmpeg -vcodec png -i $(SPLASH_DIR)/logo.png \
+	@Tools/ffmpeg/ffmpeg -vcodec png -i $(SPLASH_DIR)/logo.png \
 		-vcodec rawvideo -f rawvideo -pix_fmt bgr565 -s 240x320 -y /tmp/splash-raw.bin
 	@cat $(SPLASH_DIR)/logohdr.bin /tmp/splash-raw.bin > splash.img
 	@rm -f /tmp/splash-raw.bin
