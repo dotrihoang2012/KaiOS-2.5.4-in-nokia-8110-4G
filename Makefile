@@ -10,7 +10,7 @@ BUILDID     := $(shell bash -c 'echo $$RANDOM')
 # ── TOOLS ─────────────────────────────────────────────────────────────────────
 AIK_LINUX   := Tools/Android\ Image\ Kitchen/Linux
 AIK_WIN     := Tools/Android\ Image\ Kitchen/Windows
-MAKE_EXT4FS := Tools/make_ext4fs/bin/make_ext4fs
+MAKE_EXT4FS := Tools/make_ext4fs/make_ext4fs
 SIGN        := Tools/Sign/sign.sh
 SIGNER_DIR  := Tools/OTA\ Signer
 JAVA        := java
@@ -166,7 +166,7 @@ wipe:
 # ── SIGN & INSTALLER ──────────────────────────────────────────────────────────
 
 sign:
-	$(JAVA) -cp "$(CLASSPATH)" SignApk -w $(CERT) $(KEY) $(INPUT) $(OUTPUT)
+	$(JAVA) -cp $(CLASSPATH) SignApk -w $(CERT) $(KEY) $(INPUT) $(OUTPUT)
 
 build-installer: clean build-system build-boot build-recovery build-splash
 	@mkdir -p works/installer

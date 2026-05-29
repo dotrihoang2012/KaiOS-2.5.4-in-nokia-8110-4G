@@ -1,0 +1,15 @@
+# Built output images
+boot.img
+recovery.img
+system.img
+splash.img
+
+# Installer output
+Nokia_8110_4G_KaiOS2.5.4_*.zip
+
+# Backup/work directories
+works/
+
+# Large binaries (exceed GitHub 100MB limit)
+Tools/ffmpeg.exe
+Tools/EDL (for Windows only)/V17 nokia 8110 4G(stock)/system.img
