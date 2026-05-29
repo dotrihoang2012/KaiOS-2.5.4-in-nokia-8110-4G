@@ -9,7 +9,7 @@ rem ── TOOLS ─────────────────────
 set AIK_WIN=Tools\Android Image Kitchen\Windows
 set MAKE_EXT4FS=Tools\make_ext4fs\bin\make_ext4fs.exe
 set SIGN_DIR=Tools\Sign
-set JAVA=Tools\Java-15\bin\java.exe
+set JAVA=Tools\Java\Windows\bin\java.exe
 set CLASSPATH=%SIGN_DIR%\signapk.jar;%SIGN_DIR%\conscrypt-openjdk-uber.jar;%SIGN_DIR%\bcprov-jdk15on-1.64.jar;%SIGN_DIR%\bcpkix-jdk15on-1.64.jar
 set CERT=Tools\Keys\testkey.x509.pem
 set KEY=Tools\Keys\testkey.pk8

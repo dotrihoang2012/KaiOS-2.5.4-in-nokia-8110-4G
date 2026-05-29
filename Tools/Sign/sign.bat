@@ -9,7 +9,7 @@ if "%~2"=="" ( echo Usage: sign.bat ^<input_dir^> ^<output.zip^> & exit /b 1 )
 set SCRIPTDIR=%~dp0
 set SCRIPTDIR=%SCRIPTDIR:~0,-1%
 set KEYDIR=%SCRIPTDIR%\..\Keys
-set JAVA=%SCRIPTDIR%\..\..\Tools\Java-15\bin\java.exe
+set JAVA=%SCRIPTDIR%\..\..\Tools\Java\Windows\bin\java.exe
 if not exist "%JAVA%" set JAVA=java
 set TEMPDIR=%SCRIPTDIR%\tmp
 set TEMP_ZIP=%TEMP%\nokia_sign_%RANDOM%.zip

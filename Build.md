@@ -1,5 +1,9 @@
 # Building from Source
 
+> **Warning:** Java is distributed as a ZIP archive. You must extract it to the correct location before building:
+> - **Windows:** Extract to `Tools\Java\Windows\`
+> - **Linux:** Extract to `Tools/Java/Linux/`
+
 ## Usage
 
 **Linux**
