@@ -24,7 +24,6 @@ BOOT_DIR        := Resources/Boot
 RECOVERY_DIR    := Resources/Recovery
 SYSTEM_DIR      := Resources/System
 SPLASH_DIR      := Resources/Splash
-BLOBS_DIR       := Resources/Blobs/$(TARGET)
 OTA_DIR         := Resources/Zip\ OTA
 
 BASE_SYSTEM_SIZE := 838860800
@@ -34,9 +33,9 @@ BACKUP_DIR  := works/backups
 INPUT       ?= input.zip
 OUTPUT      ?= $(basename $(INPUT))-signed.zip
 
-.PHONY: all build build-boot build-system build-recovery build-splash repack-apps \
-        backup backup-boot backup-system backup-recovery backup-splash backup-modem backup-radio \
-        deploy deploy-boot deploy-system deploy-recovery deploy-splash deploy-modem deploy-radio \
+.PHONY: all build build-boot build-system build-recovery build-splash \
+        backup backup-boot backup-system backup-recovery backup-splash \
+        deploy deploy-boot deploy-system deploy-recovery deploy-splash \
         flash-recovery sideload sign build-installer wipe \
         clean clean-boot clean-system clean-recovery clean-splash clean-installer help
 
@@ -64,21 +63,7 @@ build-recovery: clean-recovery
 	@rm -rf $(AIK_LINUX)/split_img $(AIK_LINUX)/ramdisk $(AIK_LINUX)/ramdisk-new.cpio*
 	@echo "-> recovery.img done"
 
-repack-apps:
-	@echo "Packaging omni.ja..."
-	@cd $(SYSTEM_DIR)/b2g/omni_src && zip -9 ../omni.ja -r . && cd - && rm -rf $(SYSTEM_DIR)/b2g/omni_src
-	@echo "Packaging boot animation..."
-	@rm -f $(SYSTEM_DIR)/media/bootanimation.zip
-	@cd $(SYSTEM_DIR)/media/bootanimation_src && zip -0qry -i \*.txt \*.png \*.wav @ ../bootanimation.zip ./* && cd - && rm -rf $(SYSTEM_DIR)/media/bootanimation_src
-	@echo "Packaging WebApps..."
-	@cd $(SYSTEM_DIR)/b2g/webapps && find . -type d -maxdepth 1 -mindepth 1 | while read WEBAPP; do \
-	  echo "Packaging $$WEBAPP"; \
-	  if [ -d "$$WEBAPP/src" ]; then \
-	    cd "$$WEBAPP/src"; zip -9 ../application.zip -r .; cp manifest.webapp ../; cd -; rm -rf "$$WEBAPP/src"; \
-	  fi; \
-	done
-
-build-system: repack-apps
+build-system:
 	@echo "Building system.img..."
 	$(MAKE_EXT4FS) -a '/system' -L 'system' -j 0 -l $(BASE_SYSTEM_SIZE) system.img $(SYSTEM_DIR)/
 	@echo "-> system.img done"
@@ -93,7 +78,7 @@ build-splash: clean-splash
 
 # ── BACKUP ────────────────────────────────────────────────────────────────────
 
-backup: backup-boot backup-recovery backup-splash backup-system backup-modem backup-radio
+backup: backup-boot backup-recovery backup-splash backup-system
 
 backup-boot:
 	@mkdir -p $(BACKUP_DIR)
@@ -131,36 +116,9 @@ backup-splash:
 	$(ADB) shell rm -f $(PERSISTDIR)/splash.backup.img
 	@echo "-> Backed up to $(BACKUP_DIR)/splash.$(BUILDID).img"
 
-backup-modem:
-	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
-	$(ADB) shell mkdir -p $(PERSISTDIR)/
-	$(ADB) shell dd of=$(PERSISTDIR)/modem.backup.img if=/dev/block/bootdevice/by-name/modem bs=2048
-	$(ADB) pull $(PERSISTDIR)/modem.backup.img $(BACKUP_DIR)/modem.$(BUILDID).img
-	$(ADB) shell rm -f $(PERSISTDIR)/modem.backup.img
-	@echo "-> Backed up to $(BACKUP_DIR)/modem.$(BUILDID).img"
-
-backup-radio:
-	@mkdir -p $(BACKUP_DIR)
-	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
-	$(ADB) shell mkdir -p $(PERSISTDIR)/
-	$(ADB) shell dd of=$(PERSISTDIR)/fsg.backup.img if=/dev/block/bootdevice/by-name/fsg bs=2048
-	$(ADB) pull $(PERSISTDIR)/fsg.backup.img $(BACKUP_DIR)/fsg.$(BUILDID).img
-	$(ADB) shell rm -f $(PERSISTDIR)/fsg.backup.img
-	$(ADB) shell dd of=$(PERSISTDIR)/modemst1.backup.img if=/dev/block/bootdevice/by-name/modemst1 bs=2048
-	$(ADB) pull $(PERSISTDIR)/modemst1.backup.img $(BACKUP_DIR)/modemst1.$(BUILDID).img
-	$(ADB) shell rm -f $(PERSISTDIR)/modemst1.backup.img
-	$(ADB) shell dd of=$(PERSISTDIR)/modemst2.backup.img if=/dev/block/bootdevice/by-name/modemst2 bs=2048
-	$(ADB) pull $(PERSISTDIR)/modemst2.backup.img $(BACKUP_DIR)/modemst2.$(BUILDID).img
-	$(ADB) shell rm -f $(PERSISTDIR)/modemst2.backup.img
-	$(ADB) shell dd of=$(PERSISTDIR)/rpm.backup.img if=/dev/block/bootdevice/by-name/rpm bs=2048
-	$(ADB) pull $(PERSISTDIR)/rpm.backup.img $(BACKUP_DIR)/rpm.$(BUILDID).img
-	$(ADB) shell rm -f $(PERSISTDIR)/rpm.backup.img
-	@echo "-> Backed up to $(BACKUP_DIR)/{fsg,modemst1,modemst2,rpm}.$(BUILDID).img"
-
 # ── DEPLOY ────────────────────────────────────────────────────────────────────
 
-deploy: deploy-boot deploy-recovery deploy-splash deploy-system deploy-modem deploy-radio
+deploy: deploy-boot deploy-recovery deploy-splash deploy-system
 
 deploy-boot:
 	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
@@ -194,27 +152,6 @@ deploy-splash:
 	$(ADB) shell rm $(PERSISTDIR)/splash.img
 	@echo "-> splash.img deployed"
 
-deploy-modem:
-	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
-	$(ADB) shell mkdir -p $(PERSISTDIR)/
-	$(ADB) push $(BLOBS_DIR)/modem.img $(PERSISTDIR)/
-	$(ADB) shell dd if=$(PERSISTDIR)/modem.img of=/dev/block/bootdevice/by-name/modem bs=2048
-	$(ADB) shell rm $(PERSISTDIR)/modem.img
-	@echo "-> modem.img deployed"
-
-deploy-radio:
-	$(ADB) shell mount -o nosuid,nodev,noatime,barrier=1,noauto_da_alloc,discard $(USERDATA) /data
-	$(ADB) shell mkdir -p $(PERSISTDIR)/
-	$(ADB) push $(BLOBS_DIR)/fsg.bin $(PERSISTDIR)/
-	$(ADB) shell dd if=$(PERSISTDIR)/fsg.bin of=/dev/block/bootdevice/by-name/fsg bs=2048
-	$(ADB) shell dd if=/dev/zero of=/dev/block/bootdevice/by-name/modemst1 bs=2048
-	$(ADB) shell dd if=/dev/zero of=/dev/block/bootdevice/by-name/modemst2 bs=2048
-	$(ADB) shell rm $(PERSISTDIR)/fsg.bin
-	$(ADB) push $(BLOBS_DIR)/rpm.img $(PERSISTDIR)/
-	$(ADB) shell dd if=$(PERSISTDIR)/rpm.img of=/dev/block/bootdevice/by-name/rpm bs=2048
-	$(ADB) shell rm $(PERSISTDIR)/rpm.img
-	@echo "-> Radio images deployed"
-
 # ── FLASH ─────────────────────────────────────────────────────────────────────
 
 flash-recovery:
@@ -238,9 +175,6 @@ build-installer: clean build-system build-boot build-recovery build-splash
 	@mv boot.img works/installer/
 	@mv recovery.img works/installer/
 	@mv splash.img works/installer/
-	@cp $(BLOBS_DIR)/modem.img works/installer/
-	@cp $(BLOBS_DIR)/fsg.bin works/installer/
-	@cp $(BLOBS_DIR)/rpm.img works/installer/
 	@bash $(SIGN) works/installer Nokia_8110_4G_KaiOS2.5.4_$(VERSION).zip
 	@rm -rf works/installer
 	@echo "-> Nokia_8110_4G_KaiOS2.5.4_$(VERSION).zip done"
@@ -287,8 +221,6 @@ help:
 	@echo "    make backup-system        Backup system"
 	@echo "    make backup-recovery      Backup recovery"
 	@echo "    make backup-splash        Backup splash"
-	@echo "    make backup-modem         Backup modem"
-	@echo "    make backup-radio         Backup fsg/modemst1/modemst2/rpm"
 	@echo ""
 	@echo "  DEPLOY  (requires Pris Recovery or Philz Touch Recovery)"
 	@echo "    make deploy               Flash all images"
@@ -296,8 +228,6 @@ help:
 	@echo "    make deploy-recovery      Flash recovery.img"
 	@echo "    make deploy-system        Flash system.img"
 	@echo "    make deploy-splash        Flash splash.img"
-	@echo "    make deploy-modem         Flash modem.img"
-	@echo "    make deploy-radio         Flash fsg/modemst1/modemst2/rpm"
 	@echo ""
 	@echo "  FLASH"
 	@echo "    make flash-recovery       Reboot device into recovery"
