@@ -1,5 +1,19 @@
 # Building from Source
 
+## Usage
+
+**Linux**
+
+```
+make <target>
+```
+
+**Windows**
+
+```
+makefile <target>
+```
+
 ## Supported builds as of now
 
 - `boot`
@@ -28,20 +42,6 @@
 ### For building the splash image
 
 - FFmpeg
-
-## Usage
-
-**Linux**
-
-```
-make <target>
-```
-
-**Windows**
-
-```
-makefile <target>
-```
 
 ## Building the images
 
