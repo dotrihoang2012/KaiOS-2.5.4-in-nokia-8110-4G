@@ -229,13 +229,8 @@ move /Y system.img   works\installer\
 move /Y boot.img     works\installer\
 move /Y recovery.img works\installer\
 move /Y splash.img   works\installer\
-if not exist "works\installer\META-INF\com\google\android" mkdir "works\installer\META-INF\com\google\android"
-copy /Y "%UPDATE_BINARY%" "works\installer\META-INF\com\google\android\" >nul
 set INSTALLER_NAME=Nokia_8110_4G_KaiOS2.5.4_%VERSION%
-set TEMP_ZIP=%TEMP%\%INSTALLER_NAME%_unsigned.zip
-powershell -NoProfile -Command "Add-Type -Assembly System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('works\installer', '%TEMP_ZIP%', 'Optimal', $false)"
-%JAVA% -cp "%CLASSPATH%" SignApk -w "%CERT%" "%KEY%" "%TEMP_ZIP%" "%INSTALLER_NAME%.zip"
-del /f /q "%TEMP_ZIP%"
+call "%SIGN_DIR%\sign.bat" works\installer "%INSTALLER_NAME%.zip"
 rmdir /s /q works\installer
 echo -^> %INSTALLER_NAME%.zip done
 goto :eof
