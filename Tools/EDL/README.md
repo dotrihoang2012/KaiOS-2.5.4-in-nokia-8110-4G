@@ -2,6 +2,31 @@
 
 ## Linux
 
+### Quick Installation by Distribution
+
+**Ubuntu / Debian / Linux Mint**
+```
+sudo apt update
+sudo apt install libusb-1.0-0
+```
+
+**Red Hat / CentOS / Fedora / Rocky Linux**
+```
+sudo dnf install libusb1
+```
+
+**Arch Linux**
+```
+sudo pacman -S libusb
+```
+
+**openSUSE**
+```
+sudo zypper install libusb-1_0-0
+```
+
+### Python
+
 Add the Python PPA and install Python 3.14:
 
 ```
