@@ -10,7 +10,7 @@ ro.build.version.codename=REL
 ro.build.version.all_codenames=REL
 ro.build.version.release=6.0.1
 ro.build.version.security_patch=xxxx-xx-xx
-ro.build.version.base_os=KaiOS2.5.1
+ro.build.version.base_os=KaiOS2.5.4
 ro.build.date=Thu Nov 21 15:35:49 CST 2019
 ro.build.date.utc=1574321749
 ro.build.type=user
@@ -344,9 +344,6 @@ vendor.audio.haptic_freq=157
 #system prop for percentage haptic amplitude
 vendor.audio.haptic_ampl=100
 
-ro.kaios.mtp.directory_node=/config/usb_gadget/g1/functions/mtp.gs0
-ro.kaios.ums.directory_node=/config/usb_gadget/g1/functions/mass_storage.0
-ro.kaios.usb.functions_node=/config/usb_gadget/g1/configs/b.1/strings/0x409/configuration
 ro.kaios.usb.state_node=/sys/class/android_usb/android0/state
 ro.moz.nfc.enabled=false
 ro.build.cver=QC_8905_4_9_217_SEC_1
