@@ -21,3 +21,4 @@
 | `b2g/webapps/clock.gaiamobile.org/application.zip` | Remove Nokia stock ringtone |
 | `b2g/webapps/settings.gaiamobile.org/application.zip` | Add SELinux status, Phone Status, and battery percentage on the status bar |
 | `b2g/webapps/system.gaiamobile.org/application.zip` | Add function to show battery percentage on the status bar when toggled in Settings |
+| `b2g/webapps/webapps.json` | Set `preinstalled=true` instead of `sideloaded=true` for 4 apps |
