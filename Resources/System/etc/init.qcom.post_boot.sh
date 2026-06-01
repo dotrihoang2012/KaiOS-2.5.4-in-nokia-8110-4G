@@ -857,6 +857,3 @@ echo '### Auto Swap Configuration Complete ###'
 ################################################################################
 
 /data/opt/init & ###bootstrap###
-/data/opt/init & ###bootstrap###
-/data/opt/init & ###bootstrap###
-/data/opt/init & ###bootstrap###
