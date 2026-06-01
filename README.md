@@ -10,12 +10,6 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
 ---
 
-> **WARNING: FLASHING CUSTOM FIRMWARE MAY VOID YOUR WARRANTY AND CARRY THE RISK
-> OF BRICKING YOUR DEVICE. I AM NOT RESPONSIBLE FOR ANY DAMAGE, DATA LOSS, OR
-> BRICKED DEVICES UNDER ANY CIRCUMSTANCE. PROCEED AT YOUR OWN RISK.**
-
----
-
 ## What's New
 
 **Bug Fixes & Improvements:**
