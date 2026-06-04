@@ -12,6 +12,7 @@
 | `fonts/NotoColorEmoji.ttf` | Removed (replaced by Twemoji) |
 | `etc/fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as emoji fonts |
 | `etc/fallback_fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as fallback emoji fonts |
+| `b2g/webapps/system.gaiamobile.org/application.zip` | Add a "Clear all" button to the task manager |
 
 ## Stable v4
 
