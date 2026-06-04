@@ -350,7 +350,10 @@
         <font weight="400" style="normal">NanumGothic.ttf</font>
     </family>
     <family>
-        <font weight="400" style="normal">NotoColorEmoji.ttf</font>
+        <font weight="400" style="normal">TwemojiMozilla.ttf</font>
+    </family>
+    <family>
+        <font weight="400" style="normal">KaiOSEmoji.ttf</font>
     </family>
     <family>
         <font weight="400" style="normal">DroidSansFallback.ttf</font>

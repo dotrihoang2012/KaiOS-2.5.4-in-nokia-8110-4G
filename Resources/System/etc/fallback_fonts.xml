@@ -437,7 +437,12 @@
     </family>
     <family>
         <fileset>
-            <file>NotoColorEmoji.ttf</file>
+            <file>TwemojiMozilla.ttf</file>
+        </fileset>
+    </family>
+    <family>
+        <fileset>
+            <file>KaiOSEmoji.ttf</file>
         </fileset>
     </family>
     <family>

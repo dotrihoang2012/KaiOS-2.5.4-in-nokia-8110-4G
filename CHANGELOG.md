@@ -1,5 +1,16 @@
 # Changelog
 
+## Stable v5
+
+### `Resources/System` changes
+
+| File | Change |
+|---|---|
+| `fonts/TwemojiMozilla.ttf` | Add Twemoji emoji font (replaces Noto Color Emoji) |
+| `fonts/NotoColorEmoji.ttf` | Removed (replaced by Twemoji) |
+| `etc/fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as emoji fonts |
+| `etc/fallback_fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as fallback emoji fonts |
+
 ## Stable v4
 
 ### `Resources/System` changes
