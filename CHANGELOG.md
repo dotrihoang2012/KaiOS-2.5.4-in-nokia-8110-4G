@@ -2,6 +2,8 @@
 
 ## Stable v5
 
+**Bug fixes:** fix text overflow caused by unusual emoji.
+
 ### `Resources/System` changes
 
 | File | Change |
