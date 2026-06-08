@@ -8,6 +8,12 @@
 A custom KaiOS 2.5.4 build for the Nokia 8110 4G (TA-1048 / TA-1059),
 featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
+<p align="center">
+  <img src="img/2026-05-26-22-02-02.png">
+  <img src="img/2026-05-26-22-02-09.png">
+  <img src="img/2026-05-26-22-02-37.png">
+</p>
+
 ---
 
 # Changelog
