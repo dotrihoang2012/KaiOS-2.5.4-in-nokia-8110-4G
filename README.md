@@ -144,4 +144,4 @@ adb reboot edl
 
 ---
 
-If you encounter any issues, email: dotrihoang2012@gmail.com
+If you encounter any issues, please contact us at: https://supportkaiostech.slack.com
