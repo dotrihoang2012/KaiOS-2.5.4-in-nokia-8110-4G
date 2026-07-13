@@ -183,7 +183,6 @@ Wait until the process completes, then reboot the phone.
 
 Note: this guide only focuses on the splash partition image ("Powered by KaiOS" by default). The system splash ("Nokia") is stored in the `system` partition.
 
-Prerequisites: `ffmpeg` must be installed.
 
 ### Boot splash format description
 
