@@ -68,4 +68,6 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 ### TODO
 - Fix slider (still not responding when closed, opened)
 
+---
+
 If you encounter any issues, please contact me at: dotrihoang2012@gmail.com
