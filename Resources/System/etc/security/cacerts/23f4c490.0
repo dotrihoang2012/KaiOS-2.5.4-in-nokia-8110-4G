@@ -61,7 +61,7 @@ Certificate:
             X509v3 Authority Key Identifier: 
                 keyid:BF:5F:B7:D1:CE:DD:1F:86:F4:5B:55:AC:DC:D7:10:C2:0E:A9:88:E7
                 DirName:/C=US/O=Starfield Technologies, Inc./OU=Starfield Class 2 Certification Authority
-                serial:00
+                serial:0
 
             X509v3 Basic Constraints: 
                 CA:TRUE

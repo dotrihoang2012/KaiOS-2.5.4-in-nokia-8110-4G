@@ -64,7 +64,7 @@ Certificate:
             X509v3 Basic Constraints: critical
                 CA:TRUE
             X509v3 Private Key Usage Period: 
-                Not Before: Nov 27 20:23:42 2006 GMT, Not After: Nov 27 20:53:42 2026 GMT
+                0"..20061127202342Z..20261127205342Z
             X509v3 Authority Key Identifier: 
                 keyid:68:90:E4:67:A4:A6:53:80:C7:86:66:A4:F1:F7:4B:43:FB:84:BD:6D
 

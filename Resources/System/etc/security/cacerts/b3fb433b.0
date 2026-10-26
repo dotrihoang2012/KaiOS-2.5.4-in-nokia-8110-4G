@@ -29,8 +29,8 @@ Certificate:
         Subject: C=US, O=Entrust, Inc., OU=See www.entrust.net/legal-terms, OU=(c) 2012 Entrust, Inc. - for authorized use only, CN=Entrust Root Certification Authority - EC1
         Subject Public Key Info:
             Public Key Algorithm: id-ecPublicKey
-                Public-Key: (384 bit)
-                pub: 
+                Public-Key: (P-384)
+                pub:
                     04:84:13:c9:d0:ba:6d:41:7b:e2:6c:d0:eb:55:5f:
                     66:02:1a:24:f4:5b:89:69:47:e3:b8:c2:7d:f1:f2:
                     02:c5:9f:a0:f6:5b:d5:8b:06:19:86:4f:53:10:6d:
@@ -38,7 +38,6 @@ Certificate:
                     ea:74:0c:ef:6f:96:09:fe:63:ec:70:5d:36:ad:67:
                     77:ae:c9:9d:7c:55:44:3a:a2:63:51:1f:f5:e3:62:
                     d4:a9:47:07:3e:cc:20
-                ASN1 OID: secp384r1
         X509v3 extensions:
             X509v3 Key Usage: critical
                 Certificate Sign, CRL Sign

@@ -61,7 +61,7 @@ Certificate:
             X509v3 Authority Key Identifier: 
                 keyid:D2:C4:B0:D2:91:D4:4C:11:71:B3:61:CB:3D:A1:FE:DD:A8:6A:D4:E3
                 DirName:/C=US/O=The Go Daddy Group, Inc./OU=Go Daddy Class 2 Certification Authority
-                serial:00
+                serial:0
 
             X509v3 Basic Constraints: 
                 CA:TRUE

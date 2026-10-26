@@ -8,140 +8,61 @@
 A custom KaiOS 2.5.4 build for the Nokia 8110 4G (TA-1048 / TA-1059),
 featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
----
-
-## What's New
-
-**Bug Fixes & Improvements:**
-- Fixed lockscreen bypass vulnerability via memory cleaner
-- Added task manager
-- New API for better experience
-- Added SELinux Status in Settings
-- Added Phone Status in Settings
+<p align="left">
+  <img src="img/2026-05-26-22-02-02.png">
+  <img src="img/2026-05-26-22-02-09.png">
+  <img src="img/2026-05-26-22-02-37.png">
+</p>
 
 ---
 
-## Before Install
+# Changelog
 
-You must root or jailbreak your device before flashing.
+## Stable v5
 
-Tutorial: https://sites.google.com/view/bananahackers/home
+**Bug fixes:** fix text overflow caused by unusual emoji.
 
----
+### `Resources/System` changes
 
-## Requirements
+| File | Change |
+|---|---|
+| `fonts/TwemojiMozilla.ttf` | Add Twemoji emoji font (replaces Noto Color Emoji) |
+| `fonts/NotoColorEmoji.ttf` | Removed (replaced by Twemoji) |
+| `etc/fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as emoji fonts |
+| `etc/fallback_fonts.xml` | Use `TwemojiMozilla.ttf` and add `KaiOSEmoji.ttf` as fallback emoji fonts |
+| `b2g/webapps/system.gaiamobile.org/application.zip` | Add a "Clear all" button to the task manager |
 
-- Nokia 8110 4G (TA-1048 or TA-1059)
-- ADB & Fastboot installed on your computer
-- At least **50%** battery charge
-- A USB cable (avoid hubs)
-- Recovery mode with **test-keys** support
+## Stable v4
 
----
+### `Resources/System` changes
 
-## How to Enable ADB
+| File | Change |
+|---|---|
+| `lib/libmtp.so` | Fix incorrect reported storage capacity (now shows the real size) |
+| `b2g/webapps/webapps.json` | Set `preinstalled=true` instead of `sideloaded=true` for 4 apps |
 
-**Method 1 — Dial code**
+## Stable v3
 
-From the home screen, dial:
-```
-*#*#33284#*#*
-```
-If it doesn't work, try:
-```
-*#*#0574#*#*
-```
+### `Resources/System` changes
 
-**Method 2 — W2D (browser)**
-
-1. Open the browser on your device
-2. Go to: `http://w2d.js.org/`
-3. Navigate to **W2D KaiOS Jailbreak**
-4. Press **"Open Developer menu"**
-5. Set **Debugger → ADB and DevTools**
-
-After enabling ADB, connect to your PC and verify:
-```bash
-adb devices
-```
-
----
-
-## Flash Instructions
-
-### Method 1 — ADB Sideload (Recovery)
-
-**Step 1 — Boot into Recovery**
-```bash
-adb reboot recovery
-```
-
-**Step 2 — Wipe Data**
-
-In the recovery menu, select **"Wipe data/factory reset"** and confirm.
-
-**Step 3 — Sideload the package**
-
-Select **"Apply update" → "Apply from ADB"**, then run:
-```bash
-adb sideload kaios-2.5.4-nokia8110-signed.zip
-```
-
-**Step 4 — Reboot**
-
-Once complete, select **"Reboot system now"** from the recovery menu.
+| File | Change |
+|---|---|
+| `etc/volume.cfg` | Fix USB storage so it stays recognized when no SD card is present |
+| `etc/init.qcom.post_boot.sh` | Add auto swap setup at boot |
+| `kaios/` | Update to KaiOS 2.5.4 in sync with b2g |
+| `media/bootanimation.zip` | Replace with an animated boot logo |
+| `media/memorycleaneranimation.zip` | Add memory cleaner animation for `system.gaiamobile.org` |
+| `build.prop` | Adjust build, OS and related properties to match b2g |
+| `xbin/` | Sync binaries with Philz Touch recovery |
+| `lib/libmtp.so` | Fix USB storage being reported as fixed storage (100001, 200001) |
+| `lib/modules/wlan.ko` | Removed (no longer needed) |
+| `b2g/omni.ja` | Fix vibrator |
+| `b2g/libxul.so` | Fix USB storage not being detected when enabled but plugged in |
+| `b2g/defaults/settings.json` | Change default wallpaper and default incoming call ringtone |
+| `b2g/webapps/clock.gaiamobile.org/application.zip` | Remove Nokia stock ringtone |
+| `b2g/webapps/settings.gaiamobile.org/application.zip` | Add SELinux status, Phone Status, and battery percentage on the status bar |
+| `b2g/webapps/system.gaiamobile.org/application.zip` | Add function to show battery percentage on the status bar when toggled in Settings |
 
 ---
 
-### Method 2 — EDL (Emergency Download Mode)
-
-**Step 1 — Boot into EDL**
-```bash
-adb reboot edl
-```
-
-**Step 2 — Flash the partitions**
-
-Once the device is in EDL mode, run:
-```bash
-python edl.py w system system.img --loader=8110.mbn
-python edl.py w boot boot.img --loader=8110.mbn
-```
-
-**Step 3 — Reboot**
-```bash
-python edl.py reset
-```
-
-**Step 4 — Wipe Data**
-
-After the device boots into recovery, select **"Wipe data/factory reset"** and confirm.
-
-**Step 5 — Boot into EDL again**
-
-Connect the device to your PC, then run:
-```bash
-adb reboot edl
-```
-
----
-
-## Common Errors
-
-| Error | Fix |
-|-------|-----|
-| `signature verification failed` | Flash a test-keys recovery first |
-| `Installation aborted` | Charge battery to 50%+ |
-| ADB not detected | Try a different USB cable |
-
----
-
-## Notes
-
-- Package must be signed with **test-keys**
-- Always back up your data before flashing
-- Do not unplug or power off during the flash process
-
----
-
-If you encounter any issues, email: dotrihoang2012@gmail.com
+If you encounter any issues, please contact us at: https://supportkaiostech.slack.com

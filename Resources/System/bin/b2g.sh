@@ -76,4 +76,6 @@ if [ "$ENABLE_LOG" == "1" ]; then
   export NSPR_LOG_MODULES=$LOG_FILTER
 fi
 
+/system/bin/slidermon.sh &
+
 exec $COMMAND_PREFIX "$B2G_DIR/b2g"

@@ -61,7 +61,7 @@ Certificate:
             X509v3 Authority Key Identifier: 
                 keyid:1A:ED:FE:41:39:90:B4:24:59:BE:01:F2:52:D5:45:F6:5A:39:DC:11
                 DirName:/C=FR/O=Dhimyotis/CN=Certigna
-                serial:FE:DC:E3:01:0F:C9:48:FF
+                serial:0xfedce3010fc948ff
 
             X509v3 Key Usage: critical
                 Certificate Sign, CRL Sign
