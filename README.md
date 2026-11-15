@@ -18,6 +18,17 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
 # Changelog
 
+## Stable v6
+
+**Bug fixes:** fix sign-in Google error and fix a typo in webapps.json.
+
+### `Resources/System` changes
+
+| File | Change |
+|---|---|
+| `b2g/webapps/webapps.json` | delete customization.gaiamobile.org |
+| `b2g/omni.ja` | in chrome/toolkit/content/global/BrowserElementChildPreload.js line 79: add Cu.evalInSandbox after domain names |
+
 ## Stable v5
 
 **Bug fixes:** fix text overflow caused by unusual emoji.
