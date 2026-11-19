@@ -18,6 +18,17 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
 # Changelog
 
+## Stable v7
+
+**New** Battery saver: turns the battery indicator in the status bar yellow and lowers brightness.
+
+### `Resources/System` changes
+
+| File | Change |
+|---|---|
+| `b2g/webapps/system.gaiamobile.org/application.zip` | upgrade the newer battery saver function |
+
+
 ## Stable v6
 
 **Bug fixes:** fix sign-in Google error and fix a typo in webapps.json.
