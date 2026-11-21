@@ -18,6 +18,17 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 
 # Changelog
 
+## Stable v8
+
+**New** Update the new time last updated, add auto lower brightness in settings.
+
+### `Resources/System` changes
+
+| File | Change |
+|---|---|
+| `b2g/webapps/settings.gaiamobile.org/application.zip` | add auto lower brightness |
+| `b2g/defaults/settings.json` | update to the new time last updated |
+
 ## Stable v7
 
 **New** Battery saver: turns the battery indicator in the status bar yellow and lowers brightness.
@@ -27,7 +38,6 @@ featuring numerous bug fixes, patches, and improvements over the stock firmware.
 | File | Change |
 |---|---|
 | `b2g/webapps/system.gaiamobile.org/application.zip` | upgrade the newer battery saver function |
-
 
 ## Stable v6
 
